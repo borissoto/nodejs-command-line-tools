@@ -7,7 +7,7 @@ const fs = require('fs');
 // const lstat = util.promisify(fs.lstat);
 // OPTION CODE #2  Method #2
 // OPTION CODE #2 Method#3
-// const { lstat } = fs.promises;
+const { lstat } = fs.promises;
 // OPTION CODE #2 Method #3
 
 fs.readdir(process.cwd(), async (err, filenames) => {
@@ -22,15 +22,26 @@ fs.readdir(process.cwd(), async (err, filenames) => {
   }
   // console.log(filenames);
 
-  // OPTION CODE #2 Method #1#2#3
-  for (let filename of filenames) {
-    try {
-      const stats = await lstat(filename);
-      console.log(filename, stats.isFile());
-    } catch (err) {
-      console.log(err);
-    }
+  // OPTION CODE #3 "Good solution"
+  const statPromises = filenames.map((filename) => {
+    return lstat(filename);
+  });
+  const allStats = await Promise.all(statPromises);
+  for (let stats of allStats) {
+    const index = allStats.indexOf(stats);
+    console.log(filenames[index], stats.isFile());
   }
+  // OPTION CODE #3 "Good solution"
+
+  // OPTION CODE #2 Method #1#2#3
+  // for (let filename of filenames) {
+  //   try {
+  //     const stats = await lstat(filename);
+  //     console.log(filename, stats.isFile());
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
   // OPTION CODE #2 Method #1#2#3
 
   // OPTION CODE HERE!
